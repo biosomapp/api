@@ -10,24 +10,6 @@ const sequelize = new Sequelize(process.env.DATABASE_NAME || '', process.env.DAT
     dialect: 'mariadb',
   });
 
-// const sequelize = new Sequelize(
-//   '', {
-//     dialect: 'postgres',
-//     ssl: true,
-//     dialectOptions: {
-//       ssl: {
-//         require: true,
-//         rejectUnauthorized: false
-//       }
-//     },
-//     pool: {
-//       max: 100,
-//       min: 0
-//     },
-//     logging: false
-//   }
-// )
-
 fs
   .readdirSync(__dirname)
   .filter(folderFile => {
