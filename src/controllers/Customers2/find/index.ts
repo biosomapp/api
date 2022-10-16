@@ -62,10 +62,10 @@ Paulo | Equipe Biosom
     },
   };
   
-  const bulkEmail = async (startPage: number, endPage: number) => {
+  const bulkEmail = async (startPage: number, endPage: number, perPage: number) => {
     try {
         async function recursiveEmailSent(page: number) {
-            const limit = 50
+            const limit = perPage || 50
             const head = (page - 1) * limit
             const [customers2] = await db.sequelize.query(`
             select email, full_name, key_expiration_date, deleted from customers2 c
@@ -91,9 +91,9 @@ Paulo | Equipe Biosom
                   });
                 item += 1
                 
-                await sleep(50)
+                await sleep(300)
             }
-            await sleep(1000)
+            await sleep(500)
             
             if (page < endPage) {
                 page += 1
@@ -108,7 +108,7 @@ Paulo | Equipe Biosom
   }
 
 export const find = async (request: CustomRequest, response: Response) => {
-  const { startPage, token } = request.body
+  const { startPage, perPage, token } = request.body
 
   if (token !== process.env.TOKEN) response.status(401).send()
 
@@ -121,6 +121,6 @@ export const find = async (request: CustomRequest, response: Response) => {
             )
         const total = customers2.length / 50
         const page = startPage || 1
-    bulkEmail(page, total)
+    bulkEmail(page, total, perPage)
     response.status(200).send()
 }

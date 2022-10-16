@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import { Request, Response } from 'express'
+import { AWSSNSLog } from '../../../mongo'
 import { CustomRequest } from '../../../middlewares/authMiddleware'
 
 const awsConfig = {
@@ -12,15 +13,18 @@ const awsConfig = {
 AWS.config.update(awsConfig)
 
 export const create = async (request: Request, response: Response) => {
-  console.log('/sns request.body', request.body)
-  console.log('/sns request.headers', request.headers)
-  console.log('/sns request.headers', request.headers['x-amz-sns-message-type'])
-  console.log('is subscriptionConfirmation', request.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation')
+  const body = typeof request.body !== 'object' ? JSON.parse(request.body) : request.body
+  console.log('==> isBodyObject', typeof request.body === 'object')
+  console.log('==> body', body)
+
+  const newAWSSNSLog = {
+    snapshot: body
+  }
+  await AWSSNSLog.create(newAWSSNSLog)
   
   const arn = request.headers['x-amz-sns-topic-arn']?.toString()
   if (request.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
     console.log('entrou aws subscription confirmation')
-    const body = typeof request.body !== 'object' ? JSON.parse(request.body) : request.body
     console.log('arn', arn)
     console.log('token', body.Token)
 
