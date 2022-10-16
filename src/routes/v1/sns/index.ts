@@ -4,6 +4,6 @@ import { sns } from '../../../controllers'
 
 const snsRouter = Router()
 
-snsRouter.post('/callback', authMiddleware, sns.create)
+snsRouter.post('/callback', sns.create)
 
 export { snsRouter }
