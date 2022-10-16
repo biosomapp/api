@@ -12,21 +12,22 @@ const awsConfig = {
 AWS.config.update(awsConfig)
 
 export const create = async (request: Request, response: Response) => {
+  console.log('/sns request.body', request.body)
   console.log('/sns request.headers', request.headers)
   console.log('/sns request.headers', request.headers['x-amz-sns-message-type'])
   console.log('is subscriptionConfirmation', request.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation')
   
+  const arn = request.headers['x-amz-sns-topic-arn']?.toString()
   if (request.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
     console.log('entrou aws subscription confirmation')
-    const arn = request.headers['x-amz-sns-topic-arn']?.toString()
-    const token = request.headers['x-amz-sns-message-id']?.toString()
+    const body = typeof request.body !== 'object' ? JSON.parse(request.body) : request.body
     console.log('arn', arn)
-    console.log('token', token)
+    console.log('token', body.Token)
 
-    if (!arn || !token) return
+    if (!arn || !body.Token) return
     const params = {
       TopicArn: arn,
-      Token: token
+      Token: body.Token
     }
     const awsPromise = new AWS.SNS()
     
