@@ -108,7 +108,7 @@ Paulo | Equipe Biosom
   }
 
 export const find = async (request: CustomRequest, response: Response) => {
-  const { startPage, perPage, token } = request.body
+  const { startPage, perPage, token, notBulk } = request.body
 
   if (token !== process.env.TOKEN) response.status(401).send()
 
@@ -119,7 +119,7 @@ export const find = async (request: CustomRequest, response: Response) => {
             and c.key_expiration_date < CURRENT_DATE() 
             order by key_expiration_date asc`
             )
-        const total = customers2.length / 50
+        const total = notBulk ? 1 : customers2.length / 50
         const page = startPage || 1
     bulkEmail(page, total, perPage)
     response.status(200).send()
