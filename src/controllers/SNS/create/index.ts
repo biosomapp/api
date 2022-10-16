@@ -9,6 +9,8 @@ const awsConfig = {
   region: 'us-east-1',
 };
 
+AWS.config.update(awsConfig)
+
 export const create = async (request: Request, response: Response) => {
   console.log('/sns request.headers', request.headers)
   console.log('/sns request.headers', request.headers['x-amz-sns-message-type'])
@@ -16,18 +18,25 @@ export const create = async (request: Request, response: Response) => {
   
   if (request.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
     console.log('entrou aws subscription confirmation')
-    const arn = request.headers['x-amz-sns-topic-arn']
-    const token = request.headers['x-amz-sns-message-id']
+    const arn = request.headers['x-amz-sns-topic-arn']?.toString()
+    const token = request.headers['x-amz-sns-message-id']?.toString()
+    console.log('arn', arn)
+    console.log('token', token)
 
-    const awsPromise = new AWS.SNS(awsConfig).confirmSubscription({ TopicArn: arn, Token : token }).promise()
-    awsPromise.then(
-      function(data: any) {
-        console.log(data);
-      }).catch(
-        function(err: any) {
-          console.log('deu erro')
-          console.log(err)
-        });
+    if (!arn || !token) return
+    const params = {
+      TopicArn: arn,
+      Token: token
+    }
+    const awsPromise = new AWS.SNS()
+    
+
+    console.log('params', params)
+    awsPromise.confirmSubscription(params, function(err, data) {
+      console.log('erro', err)
+      console.log('success data', data)
+    })
+
   }
 
 
